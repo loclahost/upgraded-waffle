@@ -1,0 +1,23 @@
+{
+  "dependencies": {
+    "mongodb": "^2.2.24"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "upgraded-waffle",
+  "description": "Server for logging data from custom IoTs in the home ",
+  "version": "0.1.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loclahost/upgraded-waffle.git"
+  },
+  "author": "Staffan Runnsjö",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/loclahost/upgraded-waffle/issues"
+  },
+  "homepage": "https://github.com/loclahost/upgraded-waffle#readme"
+}
