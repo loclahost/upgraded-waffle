@@ -22,7 +22,7 @@ function addLog(request, response) {
 		data : newLog.data
 	}
 
-	mongoInterface.insertLog(insertableLog)
+	mongoInterface.createLog(insertableLog)
 	.then(function() {
 		response.writeHead(200, { 'Content-Type': 'text/plain' });
 		response.end("OK");
@@ -39,7 +39,7 @@ function getLogs(request, response) {
 		return;
 	}
 
-	mongoInterface.readLogs({'loggerId' : urlObject.query.id})
+	mongoInterface.getLogs({'loggerId' : urlObject.query.id})
 	.then(function(result) {
 		let presentableResult = result.map(function(current) {
 			return {

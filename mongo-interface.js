@@ -7,7 +7,7 @@ function connect() {
 	return MongoClient.connect(url);
 }
 
-function insertLog(logEntry) {
+function createLog(logEntry) {
 	let database = null;
 	return connect()
 	.then(function(db) {
@@ -20,7 +20,7 @@ function insertLog(logEntry) {
 	});
 }
 
-function readLogs(logSource) {
+function getLogs(logSource) {
 	let database = null;
 	return connect()
 	.then(function(db) {
@@ -33,5 +33,6 @@ function readLogs(logSource) {
 	});
 }
 
-exports.insertLog = insertLog;
-exports.readLogs = readLogs;
+
+exports.createLog = createLog;
+exports.getLogs = getLogs;
