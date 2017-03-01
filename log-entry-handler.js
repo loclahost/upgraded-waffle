@@ -21,13 +21,21 @@ function addLog(request, response) {
 		time : Date.now(),
 		data : newLog.data
 	}
-
-	mongoInterface.createLog(insertableLog)
-	.then(function() {
-		response.writeHead(200, { 'Content-Type': 'text/plain' });
-		response.end("OK");
-	})
-	.catch(function() {
+	mongoInterface.getLogPoint(insertableLog.loggerId)
+	.then(function(result) {
+		if(result.length == 1) {
+			mongoInterface.createLog(insertableLog)
+			.then(function() {
+				response.writeHead(200, { 'Content-Type': 'text/plain' });
+				response.end("OK");
+			})
+			.catch(function() {
+				failRequest(response, "Something broke in mongodb");
+			});
+		} else {
+			failRequest(response, "Logger id does not exist");
+		}
+	}).catch(function() {
 		failRequest(response, "Something broke in mongodb");
 	});
 }
