@@ -1,91 +1,51 @@
 const MongoClient = require('mongodb').MongoClient;
 
-const url = 'mongodb://localhost:27017/upgraded-waffle';
+const URL = 'mongodb://localhost:27017/upgraded-waffle';
+const LOG_COLLECTION = 'log';
+const LOG_POINT_COLLECTION = 'logPoint';
 
-function connect() {
-	return MongoClient.connect(url);
+function connectAndDo(databaseOperation) {
+	let database = null;
+	return MongoClient.connect(URL)
+	.then(function(db) {
+		database = db;
+		return databaseOperation(db);
+	})
+	.then(function(someResult) {
+		database.close();
+		return someResult;
+	});
 }
 
 function createLog(logEntry) {
-	let database = null;
-	return connect()
-	.then(function(db) {
-		database = db; 
-		return db.collection('logs').insertOne(logEntry);
-	})
-	.then(function(insertResult) {
-		database.close();
-		return insertResult;
-	});
+	return connectAndDo((db) => db.collection(LOG_COLLECTION).insertOne(logEntry));
 }
 
 function getLogs(logSource) {
-	let database = null;
-	return connect()
-	.then(function(db) {
-		database = db; 
-		return db.collection('logs').find(logSource).toArray();
-	})
-	.then(function(result){ 
-		database.close();
-		return result;
-	});
+	return connectAndDo((db) => db.collection(LOG_COLLECTION).find(logSource).toArray());
 }
 
 function createLogPoint(logPoint) {
-	let database = null;
-	return connect()
-	.then(function(db) {
-		database = db; 
-		return db.collection('logPoint').insertOne(logPoint);
-	})
-	.then(function(insertResult) {
-		database.close();
-		return insertResult;
-	});
+	return connectAndDo((db) => db.collection(LOG_POINT_COLLECTION).insertOne(logPoint));
 }
 
 function getLogPoint(loggerId) {
 	let database = null;
-	return connect()
-	.then(function(db) {
-		database = db;
+	return connectAndDo(function(db) {
 		let query = {};
 		if(!!loggerId) {
 			query.loggerId = loggerId;
 		}
-		return db.collection('logPoint').find(query).toArray();
-	})
-	.then(function(result){ 
-		database.close();
-		return result;
+		return db.collection(LOG_POINT_COLLECTION).find(query).toArray();
 	});
 }
 
 function updateLogPoint(logPoint) {
-	let database = null;
-	return connect()
-	.then(function(db) {
-		database = db; 
-		return db.collection('logPoint').updateOne({loggerId:logPoint.loggerId}, {$set:{description:logPoint.description}});
-	})
-	.then(function(insertResult) {
-		database.close();
-		return insertResult;
-	});
+	return connectAndDo((db) => db.collection(LOG_POINT_COLLECTION).updateOne({loggerId:logPoint.loggerId}, {$set:{description:logPoint.description}}));
 }
 
 function deleteLogPoint(loggerId) {
-	let database = null;
-	return connect()
-	.then(function(db) {
-		database = db; 
-		return db.collection('logPoint').deleteOne({loggerId:loggerId});
-	})
-	.then(function(insertResult) {
-		database.close();
-		return insertResult;
-	});
+	return connectAndDo((db) => db.collection(LOG_POINT_COLLECTION).deleteOne({loggerId:loggerId}));
 }
 
 exports.createLog = createLog;
