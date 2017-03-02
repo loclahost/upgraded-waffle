@@ -1,4 +1,7 @@
+"use strict"
+
 const url = require('url');
+const clientHandler = require('./client/client-handler.js');
 
 let handlers = {};
 
@@ -7,7 +10,7 @@ function handleRequest(request, response) {
 	console.log("Requested handler: " + urlObject.pathname + ". Requested method: " + request.method);
 	let requestedHandler = handlers[urlObject.pathname];
 	if (!requestedHandler) {
-		failRequest(response);
+		clientHandler.handleRequest(request, response);
 		return;
 	}
 	let handlerMethod = requestedHandler[request.method];
