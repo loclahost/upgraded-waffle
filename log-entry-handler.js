@@ -3,23 +3,21 @@
 const url = require('url');
 const mongoInterface = require('./mongo-interface.js');
 
-function addLog(request, response) {
-	let urlObject = url.parse(request.url, true);
-	let newLog = urlObject.query;
-	if(!typeof urlObject.query.id == "string") {
+function addLog(request, response, parameters) {
+	if(!typeof parameters.id == "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
 
-	if(!(typeof newLog.data == 'string')) {
+	if(!(typeof parameters.data == 'string')) {
 		failRequest(response, "Invalid data");
 		return;
 	}
 
 	let insertableLog = {
-		loggerId : newLog.id,
+		loggerId : parameters.id,
 		time : Date.now(),
-		data : newLog.data
+		data : parameters.data
 	}
 	mongoInterface.getLogPoint(insertableLog.loggerId)
 	.then(function(result) {
@@ -40,14 +38,13 @@ function addLog(request, response) {
 	});
 }
 
-function getLogs(request, response) {
-	let urlObject = url.parse(request.url, true);
-	if(!typeof urlObject.query.id == "string") {
+function getLogs(request, response, parameters) {
+	if(!typeof parameters.id == "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
 
-	mongoInterface.getLogs({'loggerId' : urlObject.query.id})
+	mongoInterface.getLogs({'loggerId' : parameters.id})
 	.then(function(result) {
 		let presentableResult = result.map(function(current) {
 			return {

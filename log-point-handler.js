@@ -3,25 +3,23 @@
 const url = require('url');
 const mongoInterface = require('./mongo-interface.js');
 
-function createLogPoint(request, response) {
-	let urlObject = url.parse(request.url, true);
-	let newLogPoint = urlObject.query;
-	if(!typeof urlObject.query.id == "string") {
+function createLogPoint(request, response, parameters) {
+	if(!typeof parameters.id == "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
 
-	if(!newLogPoint.description) {
-		newLogPoint.description = '';
-	} else if(!(typeof newLogPoint.description == 'string')) {
+	if(!parameters.description) {
+		parameters.description = '';
+	} else if(!(typeof parameters.description == 'string')) {
 		failRequest(response, "Invalid description");
 		return;
 	}
 
 	let insertableLogPoint = {
-		loggerId : newLogPoint.id,
+		loggerId : parameters.id,
 		time : Date.now(),
-		description : newLogPoint.description
+		description : parameters.description
 	}
 
 	mongoInterface.getLogPoint(insertableLogPoint.loggerId)
@@ -42,15 +40,13 @@ function createLogPoint(request, response) {
 	});
 }
 
-function getLogPoint(request, response) {
-	let urlObject = url.parse(request.url, true);
-
-	if(!!urlObject.query.id && !typeof urlObject.query.id == "string") {
+function getLogPoint(request, response, parameters) {
+	if(!!parameters.id && !typeof parameters.id == "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
 
-	mongoInterface.getLogPoint(urlObject.query.id)
+	mongoInterface.getLogPoint(parameters.id)
 	.then(function(result) {
 		let presentableResult = result.map(function(current) {
 			return {
@@ -68,22 +64,20 @@ function getLogPoint(request, response) {
 	});
 }
 
-function updateLogPoint(request, response) {
-	let urlObject = url.parse(request.url, true);
-	let updatedLogPoint = urlObject.query;
-	if(!typeof updatedLogPoint.id == "string") {
+function updateLogPoint(request, response, parameters) {
+	if(!typeof parameters.id == "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
 
-	if(!(typeof updatedLogPoint.description == 'string')) {
+	if(!(typeof parameters.description == 'string')) {
 		failRequest(response, "Invalid description");
 		return;
 	}
 
 	let insertableLogPoint = {
-		loggerId : updatedLogPoint.id,
-		description : updatedLogPoint.description
+		loggerId : parameters.id,
+		description : parameters.description
 	}
 
 	mongoInterface.updateLogPoint(insertableLogPoint)
@@ -97,14 +91,13 @@ function updateLogPoint(request, response) {
 	});
 }
 
-function deleteLogPoint(request, response) {
-	let urlObject = url.parse(request.url, true);
-	if(!typeof urlObject.query.id == "string") {
+function deleteLogPoint(request, response, parameters) {
+	if(!typeof parameters.id == "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
 
-	mongoInterface.deleteLogPoint(urlObject.query.id)
+	mongoInterface.deleteLogPoint(parameters.id)
 	.then(function() {
 		response.writeHead(200, { 'Content-Type': 'text/plain' });
 		response.end("OK");
