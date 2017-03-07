@@ -19,6 +19,7 @@
 			$.each(data, function(key, value){
 				let logPoint = {};
 				logPoint.label = value.loggerId;
+				logPoint.borderColor = value.color;
 				logPoint.data = [];
 				datasets.push(logPoint);
 				logDataRequests.push($.getJSON("/log/data", {id:value.loggerId}, function(data) {

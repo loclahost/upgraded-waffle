@@ -5,6 +5,7 @@
 		$.getJSON('/log/point',{id:loggerId}, function(data) {
 			$('#loggerId').replaceWith('<span class="form-control">' + data[0].loggerId + '</span>');
 			$('#inputDescription').val(data[0].description);
+			$('#inputColor').val(data[0].color);
 		});
 	} else {
 		$('#delete-button').remove();
@@ -29,7 +30,8 @@
 		$('#ok-button').click(function() {
 			let data = {
 				id: loggerId || $('#loggerId').val(),
-				description: $('#inputDescription').val()
+				description: $('#inputDescription').val(),
+				color: $('#inputColor').val()
 			};
 
 			let method = "POST";

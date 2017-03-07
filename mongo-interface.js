@@ -41,7 +41,7 @@ function getLogPoint(loggerId) {
 }
 
 function updateLogPoint(logPoint) {
-	return connectAndDo((db) => db.collection(LOG_POINT_COLLECTION).updateOne({loggerId:logPoint.loggerId}, {$set:{description:logPoint.description}}));
+	return connectAndDo((db) => db.collection(LOG_POINT_COLLECTION).updateOne({loggerId:logPoint.loggerId}, {$set:{description:logPoint.description, color:logPoint.color}}));
 }
 
 function deleteLogPoint(loggerId) {

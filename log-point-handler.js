@@ -2,6 +2,7 @@
 
 const url = require('url');
 const mongoInterface = require('./mongo-interface.js');
+const VALID_CSS_COLOR = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i;
 
 function createLogPoint(request, response, parameters) {
 	if(!typeof parameters.id == "string") {
@@ -16,10 +17,21 @@ function createLogPoint(request, response, parameters) {
 		return;
 	}
 
+	if(!parameters.color) {
+		parameters.color = '#000000';
+	} else if(!(typeof parameters.color == 'string')) {
+		failRequest(response, 'Invalid color');
+		return;
+	} else if(!VALID_CSS_COLOR.test(parameters.color)) {
+		failRequest(response, 'Invalid color');
+		return;
+	}
+
 	let insertableLogPoint = {
 		loggerId : parameters.id,
 		time : Date.now(),
-		description : parameters.description
+		description : parameters.description,
+		color : parameters.color
 	}
 
 	mongoInterface.getLogPoint(insertableLogPoint.loggerId)
@@ -52,7 +64,8 @@ function getLogPoint(request, response, parameters) {
 			return {
 				loggerId : current.loggerId,
 				time : current.time,
-				description : current.description
+				description : current.description,
+				color : current.color
 			};
 		});
 		response.writeHead(200, { 'Content-Type': 'application/json' });
@@ -75,9 +88,18 @@ function updateLogPoint(request, response, parameters) {
 		return;
 	}
 
+	if(!(typeof parameters.color == 'string')) {
+		failRequest(response, 'Invalid color');
+		return;
+	} else if(!VALID_CSS_COLOR.test(parameters.color)) {
+		failRequest(response, 'Invalid color');
+		return;
+	}
+
 	let insertableLogPoint = {
 		loggerId : parameters.id,
-		description : parameters.description
+		description : parameters.description,
+		color : parameters.color
 	}
 
 	mongoInterface.updateLogPoint(insertableLogPoint)
