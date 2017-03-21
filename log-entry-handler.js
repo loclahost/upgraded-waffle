@@ -1,7 +1,7 @@
 "use strict"
 
 const url = require('url');
-const mongoInterface = require('./mongo-interface.js');
+const db = require('./simpledb-interface.js');
 
 function addLog(request, response, parameters) {
 	if(!typeof parameters.id == "string") {
@@ -19,23 +19,15 @@ function addLog(request, response, parameters) {
 		time : Date.now(),
 		data : parameters.data
 	}
-	mongoInterface.getLogPoint(insertableLog.loggerId)
-	.then(function(result) {
-		if(result.length == 1) {
-			mongoInterface.createLog(insertableLog)
-			.then(function() {
-				response.writeHead(200, { 'Content-Type': 'text/plain' });
-				response.end("OK");
-			})
-			.catch(function() {
-				failRequest(response, "Something broke in mongodb");
-			});
-		} else {
-			failRequest(response, "Logger id does not exist");
-		}
-	}).catch(function() {
-		failRequest(response, "Something broke in mongodb");
-	});
+	let logPoint = db.getLogPoint(insertableLog.loggerId);
+
+	if(logPoint.length == 1) {
+		db.createLog(insertableLog);
+		response.writeHead(200, { 'Content-Type': 'text/plain' });
+		response.end("OK");
+	} else {
+		failRequest(response, "Logger id does not exist");
+	}
 }
 
 function getLogs(request, response, parameters) {
@@ -44,20 +36,14 @@ function getLogs(request, response, parameters) {
 		return;
 	}
 
-	mongoInterface.getLogs({'loggerId' : parameters.id})
-	.then(function(result) {
-		let presentableResult = result.map(function(current) {
-			return {
-				time : current.time,
-				data : current.data
-			};
-		});
-		response.writeHead(200, { 'Content-Type': 'application/json' });
-		response.end(JSON.stringify(presentableResult));
-	})
-	.catch(function() {
-		failRequest(response, "Something broke in mongodb");
+	let logs = db.getLogs(parameters.id).map(function(current) {
+		return {
+			time : current.time,
+			data : current.data
+		};
 	});
+	response.writeHead(200, { 'Content-Type': 'application/json' });
+	response.end(JSON.stringify(logs));
 }
 
 function failRequest(response, reason) {

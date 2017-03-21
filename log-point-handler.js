@@ -1,7 +1,7 @@
 "use strict"
 
 const url = require('url');
-const mongoInterface = require('./mongo-interface.js');
+const db = require('./simpledb-interface.js');
 const VALID_CSS_COLOR = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i;
 
 function createLogPoint(request, response, parameters) {
@@ -34,22 +34,15 @@ function createLogPoint(request, response, parameters) {
 		color : parameters.color
 	}
 
-	mongoInterface.getLogPoint(insertableLogPoint.loggerId)
-	.then(function(result) {
-		if(result.length == 0) {
-			mongoInterface.createLogPoint(insertableLogPoint)
-			.then(function() {
-				response.writeHead(200, { 'Content-Type': 'text/plain' });
-				response.end("OK");
-			});
-		} else {
-			failRequest(response, "Logger id already exists");
-		}
-	})
-	.catch(function(err) {
-		console.log(err);
-		failRequest(response, "Something broke in mongodb");
-	});
+	let logPoint = db.getLogPoint(insertableLogPoint.loggerId);
+	if(logPoint.length == 0) {
+		db.createLogPoint(insertableLogPoint);
+		response.writeHead(200, { 'Content-Type': 'text/plain' });
+		response.end("OK");
+	} else {
+		failRequest(response, "Logger id already exists");
+	}
+
 }
 
 function getLogPoint(request, response, parameters) {
@@ -58,23 +51,17 @@ function getLogPoint(request, response, parameters) {
 		return;
 	}
 
-	mongoInterface.getLogPoint(parameters.id)
-	.then(function(result) {
-		let presentableResult = result.map(function(current) {
-			return {
-				loggerId : current.loggerId,
-				time : current.time,
-				description : current.description,
-				color : current.color
-			};
-		});
-		response.writeHead(200, { 'Content-Type': 'application/json' });
-		response.end(JSON.stringify(presentableResult));
-	})
-	.catch(function(err) {
-		console.log(err);
-		failRequest(response, "Something broke in mongodb");
+	let logPoints = db.getLogPoint(parameters.id).map(function(current) {
+		return {
+			loggerId : current.loggerId,
+			time : current.time,
+			description : current.description,
+			color : current.color
+		};
 	});
+	response.writeHead(200, { 'Content-Type': 'application/json' });
+	response.end(JSON.stringify(logPoints));
+
 }
 
 function updateLogPoint(request, response, parameters) {
@@ -102,15 +89,9 @@ function updateLogPoint(request, response, parameters) {
 		color : parameters.color
 	}
 
-	mongoInterface.updateLogPoint(insertableLogPoint)
-	.then(function() {
-		response.writeHead(200, { 'Content-Type': 'text/plain' });
-		response.end("OK");
-	})
-	.catch(function(err) {
-		console.log(err);
-		failRequest(response, "Something broke in mongodb");
-	});
+	db.updateLogPoint(insertableLogPoint);
+	response.writeHead(200, { 'Content-Type': 'text/plain' });
+	response.end("OK");
 }
 
 function deleteLogPoint(request, response, parameters) {
@@ -119,15 +100,9 @@ function deleteLogPoint(request, response, parameters) {
 		return;
 	}
 
-	mongoInterface.deleteLogPoint(parameters.id)
-	.then(function() {
-		response.writeHead(200, { 'Content-Type': 'text/plain' });
-		response.end("OK");
-	})
-	.catch(function(err) {
-		console.log(err);
-		failRequest(response, "Something broke in mongodb");
-	});
+	db.deleteLogPoint(parameters.id);
+	response.writeHead(200, { 'Content-Type': 'text/plain' });
+	response.end("OK");
 }
 
 function failRequest(response, reason) {
