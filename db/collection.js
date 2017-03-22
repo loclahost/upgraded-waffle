@@ -90,7 +90,6 @@ function collection(name, dataPath) {
 			persistChange({operation:'D', index:element['_index']});
 			collection.splice(element['_index'], 1);
 		});
-		pack();
 	}
 
 	return {
