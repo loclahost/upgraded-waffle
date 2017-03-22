@@ -1,7 +1,10 @@
 .logpoint {
 	margin-top: 10px;
-	border:1px solid gray;
 	cursor: pointer;
+}
+.logpoint-inner {
+	border:1px solid gray;
+	padding: 10px;
 }
 .main-content {
 	padding-top:60px;
