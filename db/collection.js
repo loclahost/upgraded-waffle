@@ -25,11 +25,16 @@ function collection(name, dataPath) {
 	}
 
 	function unPack() {
-		let collectionFileContent = fs.readFileSync(sourcePath, 'utf-8');
-		if(!collectionFileContent || collectionFileContent.length == 0) {
+		try {
+			let collectionFileContent = fs.readFileSync(sourcePath, 'utf-8');
+
+			if(!collectionFileContent || collectionFileContent.length == 0) {
+				collection = [];
+			} else {
+				collection = JSON.parse(collectionFileContent);
+			}
+		} catch (err) {
 			collection = [];
-		} else {
-			collection = JSON.parse();
 		}
 
 		fs.readFileSync(logPath, 'utf-8')
