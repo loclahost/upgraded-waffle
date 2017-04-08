@@ -3,15 +3,23 @@
 const url = require('url');
 const db = require('./simpledb-interface.js');
 
-function addLog(request, response, parameters) {
+function addRESTLog(request, response, parameters) {
+	let result = addLog(parameters);
+	if(result.error) {
+		failRequest(response, "Logger id does not exist");
+	} else {
+		response.writeHead(200, { 'Content-Type': 'text/plain' });
+		response.end("OK");
+	}
+}
+
+function addLog(parameters) {
 	if(!typeof parameters.id == "string") {
-		failRequest(response, "Invalid id");
-		return;
+		return {error:true, reason: 'Invalid id'};
 	}
 
 	if(!(typeof parameters.data == 'string')) {
-		failRequest(response, "Invalid data");
-		return;
+		return {error:true, reason: 'Invalid data'};
 	}
 
 	let insertableLog = {
@@ -21,13 +29,11 @@ function addLog(request, response, parameters) {
 	}
 	let logPoint = db.getLogPoint(insertableLog.loggerId);
 
-	if(logPoint.length == 1) {
-		db.createLog(insertableLog);
-		response.writeHead(200, { 'Content-Type': 'text/plain' });
-		response.end("OK");
-	} else {
-		failRequest(response, "Logger id does not exist");
+	if(logPoint.length != 1) {
+		return {error:true, reason: 'Logger id does not exist'};
 	}
+	db.createLog(insertableLog);
+	return {error:false};
 }
 
 function getLogs(request, response, parameters) {
@@ -54,8 +60,9 @@ function failRequest(response, reason) {
 function getRequestHandler() {
 	return {
 		'GET':getLogs,
-		'POST': addLog
+		'POST': addRESTLog
 	};
 }
 
 exports.getRequestHandler = getRequestHandler;
+exports.addLog = addLog;

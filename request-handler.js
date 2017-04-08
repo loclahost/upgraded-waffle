@@ -4,6 +4,7 @@ const extend = require('extend');
 const qs = require('querystring');
 const url = require('url');
 const clientHandler = require('./client/client-handler.js');
+const tcpHandler = require('./log-entry-handler.js');
 
 let handlers = {};
 
@@ -19,13 +20,14 @@ function handleRequest(request, response) {
 		failRequest(response);
 		return;
 	}
-	var body = '';
+	let body = '';
 	request.on('data', function (data) {
 		body += data;
 
             // Too much POST data, kill the connection (4kb)
-            if (body.length > 4096)
+            if (body.length > 4096) {
             	request.connection.destroy();
+            }
         });
 
 	request.on('end', function () {
@@ -43,5 +45,22 @@ function failRequest(response) {
 	response.end('I am not a teapot');
 }
 
+function handleTCPRequest(socket) {
+	let connectionData = '';
+	socket.on('data', function (data) {
+		connectionData += data;
+
+		// Too much data, kill the connection (1kb)
+		if (connectionData.length > 1024) {
+			socket.destroy();
+		}
+	});
+
+	socket.on('end', function () {
+		tcpHandler.addLog(JSON.parse(connectionData));
+	});
+}
+
 exports.handleRequest = handleRequest;
 exports.addHandler = addHandler;
+exports.handleTCPRequest = handleTCPRequest;
