@@ -2,6 +2,7 @@ const uuidV4 = require('uuid/v4');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+const extend = require('extend');
 
 function collection(name, dataPath) {
 	let logPath = path.resolve(dataPath, name + '_log');
