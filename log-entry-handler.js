@@ -24,7 +24,7 @@ function addLog(parameters) {
 
 	let insertableLog = {
 		loggerId : parameters.id,
-		time : Date.now(),
+		time : +Date.now(),
 		data : parameters.data
 	}
 	let logPoint = db.getLogPoint(insertableLog.loggerId);

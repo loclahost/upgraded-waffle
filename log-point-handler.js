@@ -29,7 +29,7 @@ function createLogPoint(request, response, parameters) {
 
 	let insertableLogPoint = {
 		loggerId : parameters.id,
-		time : Date.now(),
+		time : +Date.now(),
 		description : parameters.description,
 		color : parameters.color
 	}
