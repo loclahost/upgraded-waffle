@@ -5,21 +5,21 @@ const db = require('./simpledb-interface.js');
 const VALID_CSS_COLOR = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i;
 
 function createLogPoint(request, response, parameters) {
-	if(!typeof parameters.id == "string") {
+	if(typeof parameters.id != "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
 
 	if(!parameters.description) {
 		parameters.description = '';
-	} else if(!(typeof parameters.description == 'string')) {
+	} else if(typeof parameters.description != 'string') {
 		failRequest(response, "Invalid description");
 		return;
 	}
 
 	if(!parameters.color) {
 		parameters.color = '#000000';
-	} else if(!(typeof parameters.color == 'string')) {
+	} else if(typeof parameters.color != 'string') {
 		failRequest(response, 'Invalid color');
 		return;
 	} else if(!VALID_CSS_COLOR.test(parameters.color)) {
@@ -46,7 +46,7 @@ function createLogPoint(request, response, parameters) {
 }
 
 function getLogPoint(request, response, parameters) {
-	if(!!parameters.id && !typeof parameters.id == "string") {
+	if(!!parameters.id && typeof parameters.id != "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
@@ -65,17 +65,17 @@ function getLogPoint(request, response, parameters) {
 }
 
 function updateLogPoint(request, response, parameters) {
-	if(!typeof parameters.id == "string") {
+	if(typeof parameters.id != "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
 
-	if(!(typeof parameters.description == 'string')) {
+	if(typeof parameters.description != 'string') {
 		failRequest(response, "Invalid description");
 		return;
 	}
 
-	if(!(typeof parameters.color == 'string')) {
+	if(typeof parameters.color != 'string') {
 		failRequest(response, 'Invalid color');
 		return;
 	} else if(!VALID_CSS_COLOR.test(parameters.color)) {
@@ -95,7 +95,7 @@ function updateLogPoint(request, response, parameters) {
 }
 
 function deleteLogPoint(request, response, parameters) {
-	if(!typeof parameters.id == "string") {
+	if(typeof parameters.id != "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}

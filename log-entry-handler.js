@@ -6,7 +6,7 @@ const db = require('./simpledb-interface.js');
 function addRESTLog(request, response, parameters) {
 	let result = addLog(parameters);
 	if(result.error) {
-		failRequest(response, "Logger id does not exist");
+		failRequest(response, result.reason);
 	} else {
 		response.writeHead(200, { 'Content-Type': 'text/plain' });
 		response.end("OK");
@@ -14,11 +14,11 @@ function addRESTLog(request, response, parameters) {
 }
 
 function addLog(parameters) {
-	if(!typeof parameters.id == "string") {
+	if(typeof parameters.id != "string") {
 		return {error:true, reason: 'Invalid id'};
 	}
 
-	if(!(typeof parameters.data == 'string')) {
+	if(typeof parameters.data != 'string') {
 		return {error:true, reason: 'Invalid data'};
 	}
 
@@ -37,7 +37,7 @@ function addLog(parameters) {
 }
 
 function getLogs(request, response, parameters) {
-	if(!typeof parameters.id == "string") {
+	if(typeof parameters.id != "string") {
 		failRequest(response, "Invalid id");
 		return;
 	}
