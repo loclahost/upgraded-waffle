@@ -7,8 +7,10 @@ function createLog(logEntry) {
 	db.getCollection(LOG_COLLECTION).insertElement(logEntry);
 }
 
-function getLogs(loggerId) {
-	return db.getCollection(LOG_COLLECTION).findElements((element) => element['loggerId'] == loggerId);
+function getLogs(loggerId, start) {
+	return db.getCollection(LOG_COLLECTION).findElements((element) =>  {
+		return element['loggerId'] == loggerId && element['time'] > start;
+	});
 }
 
 function createLogPoint(logPoint) {
