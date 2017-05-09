@@ -42,10 +42,12 @@ function getLogs(request, response, parameters) {
 		return;
 	}
 
-	if(typeof parameters.start_intervall != "number") {
+	if(!parameters.start_intervall) {
 		let oneWeek = new Date();
 		oneWeek.setDate(oneWeek.getDate() - 7);
 		parameters.start_intervall = oneWeek.getTime();
+	} else {
+		parameters.start_intervall = Number(parameters.start_intervall);
 	}
 
 	let logs = db.getLogs(parameters.id, parameters.start_intervall)
